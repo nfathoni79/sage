@@ -1,0 +1,151 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import Hls from 'hls.js/dist/hls.min'
+
+import Preloader from './components/Preloader.vue'
+import VideoSection from './components/VideoSection.vue'
+import MenuSection from './components/MenuSection.vue'
+import TopAiringSection from './components/TopAiringSection.vue'
+import SearchSection from './components/SearchSection.vue'
+import AnimeInfoSection from './components/AnimeInfoSection.vue'
+
+import AnimeService from './services/AnimeService'
+
+const menu = ref('home')
+const windowLoaded = ref(false)
+const loading = ref(false)
+const sourceSet = ref(false)
+
+const topAiringList = ref([])
+const searchList = ref([])
+const animeInfo = ref(null)
+const sources = ref([])
+
+const plyrParent = ref(null)
+const plyrOptions = {
+  controls: [
+    'play-large', 'play', 'progress', 'current-time',
+    'mute', 'volume', 'fullscreen'
+  ],
+}
+
+let hls = new Hls()
+
+const setMenu = (newMenu) => menu.value = newMenu 
+
+const getTopAiring = () => {
+  loading.value =  true
+
+  AnimeService.getTopAiring()
+    .then((response) => {
+      topAiringList.value = response.data.results
+    }) 
+    .catch((error) => {
+      console.log(error)
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+const search = (query) => {
+  menu.value = 'search'
+  loading.value = true
+  searchList.value = []
+
+  AnimeService.search(query)
+    .then((response) => {
+      searchList.value = response.data.results
+    }) 
+    .catch((error) => {
+      console.log(error)
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+const getAnimeInfo = (id) => {
+  menu.value = 'info'
+  loading.value = true
+  animeInfo.value = null
+
+  AnimeService.getAnimeInfo(id)
+    .then((response) => {
+      animeInfo.value = response.data
+    }) 
+    .catch((error) => {
+      console.log(error)
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+const getSources = (episodeId) => {
+  sources.value = []
+
+  AnimeService.getStreamLink(episodeId)
+    .then((response) => {
+      sources.value = response.data.sources.filter((source) => {
+        return source.quality != 'backup' && source.quality != 'default'
+      })
+    }) 
+    .catch((error) => {
+      console.log(error)
+    })
+}
+
+const setHlsSource = (source) => {
+  if (Hls.isSupported()) {
+    sourceSet.value = false
+
+    hls.destroy()
+    hls = new Hls()
+    hls.loadSource(`https://corsbypass.herokuapp.com/${source}`)
+    hls.attachMedia(plyrParent.value.plyr.player.media)
+    window.hls = hls
+  }
+}
+
+const getCurrentYear = () => {
+  return new Date().getFullYear()
+}
+
+onMounted(() => {
+  window.addEventListener( 'load', () => windowLoaded.value = true)
+  plyrParent.value.plyr.player.on('progress', () => sourceSet.value = true)
+
+  getTopAiring()
+})
+</script>
+
+<template>
+  <div class="mx-auto max-w-sm">
+    <Preloader :active="!windowLoaded" />
+    
+    <VideoSection ref="plyrParent"
+      :active="menu != 'home' && menu != 'search'" :sourceSet="sourceSet"
+      :plyrOptions="plyrOptions" />
+
+    <MenuSection @changeMenu="(newMenu) => setMenu(newMenu)"
+      @search="(query) => search(query)" />
+
+    <TopAiringSection v-if="menu == 'home'"
+      :topAiringList="topAiringList" :loading="loading"
+      @selectAnime="(id) => getAnimeInfo(id)" />
+
+    <SearchSection v-if="menu == 'search'"
+      :searchList="searchList" :loading="loading"
+      @selectAnime="(id) => getAnimeInfo(id)" />
+
+    <AnimeInfoSection v-if="menu == 'info'"
+      :animeInfo="animeInfo" :sources="sources" :loading="loading"
+      @changeEpisode="(id) => getSources(id)"
+      @changeQuality="(url) => setHlsSource(url)" />
+    
+    <div class="p-2 text-sm text-center">
+      <p>{{ `&copy; ${getCurrentYear()} ウィブ` }}</p>
+    </div>
+  </div>
+</template>
