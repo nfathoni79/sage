@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import Hls from 'hls.js/dist/hls.min'
 
 import Preloader from './components/Preloader.vue'
@@ -24,12 +24,17 @@ const sources = ref([])
 const plyrParent = ref(null)
 const plyrOptions = {
   controls: [
-    'play-large', 'play', 'progress', 'current-time',
+    'play-large', 'rewind', 'play', 'fast-forward', 'progress', 'current-time',
     'mute', 'volume', 'fullscreen'
   ],
 }
+const plyrCurrentTime = ref(0)
 
 let hls = new Hls()
+
+const plyrPlayer = computed(() => {
+  return plyrParent.value.plyr.player
+})
 
 const setMenu = (newMenu) => menu.value = newMenu 
 
@@ -84,6 +89,7 @@ const getAnimeInfo = (id) => {
 
 const getSources = (episodeId) => {
   sources.value = []
+  plyrCurrentTime.value =  0
 
   AnimeService.getStreamLink(episodeId)
     .then((response) => {
@@ -103,7 +109,7 @@ const setHlsSource = (source) => {
     hls.destroy()
     hls = new Hls()
     hls.loadSource(`https://corsbypass.herokuapp.com/${source}`)
-    hls.attachMedia(plyrParent.value.plyr.player.media)
+    hls.attachMedia(plyrPlayer.value.media)
     window.hls = hls
   }
 }
@@ -114,7 +120,17 @@ const getCurrentYear = () => {
 
 onMounted(() => {
   window.addEventListener( 'load', () => windowLoaded.value = true)
-  plyrParent.value.plyr.player.on('progress', () => sourceSet.value = true)
+
+  plyrPlayer.value.on('progress', () => {
+    sourceSet.value = true
+    plyrPlayer.value.currentTime = plyrCurrentTime.value
+  })
+
+  plyrPlayer.value.on('timeupdate', () => {
+    if (sourceSet.value) {
+      plyrCurrentTime.value = plyrPlayer.value.currentTime
+    }
+  })
 
   getTopAiring()
 })

@@ -26,3 +26,22 @@ defineExpose({ plyr })
     </div>
   </div>
 </template>
+
+<style>
+.plyr__volume {
+  max-width: initial;
+  min-width: initial;
+  width: auto;
+  position: relative;
+}
+
+.plyr__volume input[data-plyr="volume"] {
+  width: 4rem;
+  margin: 0;
+  position: absolute;
+  left: 50%;
+  top: -1rem;
+  transform-origin: left;
+  transform: rotate(-90deg);
+}
+</style>
