@@ -89,6 +89,7 @@ const getAnimeInfo = (id) => {
 
 const getSources = (episodeId) => {
   sources.value = []
+  sourceSet.value = false
   plyrCurrentTime.value =  0
 
   AnimeService.getStreamLink(episodeId)
