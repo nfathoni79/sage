@@ -28,20 +28,18 @@ defineExpose({ plyr })
 </template>
 
 <style>
-.plyr__volume {
-  max-width: initial;
-  min-width: initial;
-  width: auto;
+.plyr__progress__container {
   position: relative;
 }
 
-.plyr__volume input[data-plyr="volume"] {
-  width: 4rem;
-  margin: 0;
+.plyr__progress__container .plyr__progress {
   position: absolute;
-  left: 50%;
-  top: -1rem;
-  transform-origin: left;
-  transform: rotate(-90deg);
+  top: -40px;
+  left: -90px;
+  width: calc(100% + 260px);
+}
+
+.plyr__volume {
+  width: 100px
 }
 </style>

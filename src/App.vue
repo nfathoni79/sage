@@ -122,7 +122,7 @@ const getCurrentYear = () => {
 onMounted(() => {
   window.addEventListener( 'load', () => windowLoaded.value = true)
 
-  plyrPlayer.value.on('progress', () => {
+  plyrPlayer.value.on('loadeddata', () => {
     sourceSet.value = true
     plyrPlayer.value.currentTime = plyrCurrentTime.value
   })
