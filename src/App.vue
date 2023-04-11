@@ -120,7 +120,10 @@ const getCurrentYear = () => {
 }
 
 onMounted(() => {
-  window.addEventListener( 'load', () => windowLoaded.value = true)
+  window.addEventListener( 'load', () => {
+    windowLoaded.value = true
+    getTopAiring()
+  })
 
   plyrPlayer.value.on('loadeddata', () => {
     sourceSet.value = true
@@ -132,8 +135,6 @@ onMounted(() => {
       plyrCurrentTime.value = plyrPlayer.value.currentTime
     }
   })
-
-  getTopAiring()
 })
 </script>
 
