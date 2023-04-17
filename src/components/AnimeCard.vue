@@ -17,7 +17,9 @@ const shortTitle = computed(() => {
 
 <template>
   <a :title="title"
-    class="rounded-lg shadow-lg bg-white hover:bg-gray-50
+    class="rounded-lg shadow-lg
+    border border-gray-200 dark:border-gray-700
+    bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700
     overflow-hidden cursor-pointer">
     <div class="w-full aspect-square
       flex items-center justify-center bg-blue-100">
@@ -26,7 +28,7 @@ const shortTitle = computed(() => {
     </div>
 
     <div class="p-2">
-      <h2 class="text-sm font-semibold text-gray-800">
+      <h2 class="text-sm font-semibold text-gray-800 dark:text-white">
         {{ shortTitle }}
       </h2>
 

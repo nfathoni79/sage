@@ -33,20 +33,24 @@ const filteredSearchList = computed(() => {
 
 <template>
   <div class="p-2">
-    <h1 class="text-xl font-semibold text-gray-800 text-center">
+    <h1 class="text-xl font-semibold
+      text-gray-800 dark:text-white text-center">
       Search Results
     </h1>
 
     <Spinner v-if="loading" class="mt-4 mx-auto h-8 w-8 text-blue-600" />
 
-    <p v-else-if="!loading && searchList.length <= 0" class="mt-4 text-center">
+    <p v-else-if="!loading && searchList.length <= 0"
+      class="mt-4 text-gray-800 dark:text-white text-center">
       No result
     </p>
 
     <div v-else>
       <!-- Filter -->
       <div class="mt-2 flex items-center justify-center gap-2">
-        <span class="text-sm font-semibold text-gray-800">Audio</span>
+        <span class="text-sm font-semibold text-gray-800 dark:text-white">
+          Audio
+        </span>
         <ARadioGroup v-model="audio" group="audio" :options="audioOptions"
             class="flex gap-2" />
       </div>

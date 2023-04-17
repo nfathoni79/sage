@@ -24,8 +24,10 @@ const getId = (position) => {
       
         <label :for="getId(index)"
           class="flex items-center justify-center
-          bg-white hover:bg-gray-50 border border-gray-300 rounded-full
-          px-2 py-1 text-gray-800 cursor-pointer focus:outline-none
+          rounded-full border border-gray-300 dark:border-gray-600
+          bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800
+          px-2 py-1 text-gray-800 dark:text-white
+          cursor-pointer focus:outline-none
           peer-checked:ring-blue-500 peer-checked:ring-2
           peer-checked:border-transparent">
           {{ option }}

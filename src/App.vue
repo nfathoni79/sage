@@ -15,6 +15,7 @@ const menu = ref('home')
 const windowLoaded = ref(false)
 const loading = ref(false)
 const sourceSet = ref(false)
+const darkTheme = ref(false)
 
 const topAiringList = ref([])
 const searchList = ref([])
@@ -54,6 +55,8 @@ const getTopAiring = () => {
 }
 
 const search = (query) => {
+  if (query == '') return
+
   menu.value = 'search'
   loading.value = true
   searchList.value = []
@@ -119,6 +122,17 @@ const getCurrentYear = () => {
   return new Date().getFullYear()
 }
 
+const toggleTheme = () => {
+  if (darkTheme.value) {
+    document.documentElement.className = ''
+  } else {
+    document.documentElement.className = 'dark'
+  }
+
+  darkTheme.value = !darkTheme.value
+  localStorage.setItem('darkTheme', darkTheme.value)
+}
+
 onMounted(() => {
   window.addEventListener( 'load', () => {
     windowLoaded.value = true
@@ -135,19 +149,24 @@ onMounted(() => {
       plyrCurrentTime.value = plyrPlayer.value.currentTime
     }
   })
+
+  darkTheme.value = JSON.parse(localStorage.getItem('darkTheme')) === true
+  if (darkTheme.value) document.documentElement.className = 'dark'
 })
 </script>
 
 <template>
-  <div class="mx-auto max-w-sm">
+  <div class="mx-auto max-w-md bg-white dark:bg-gray-900">
     <Preloader :active="!windowLoaded" />
     
     <VideoSection ref="plyrParent"
       :active="menu != 'home' && menu != 'search'" :sourceSet="sourceSet"
       :plyrOptions="plyrOptions" />
 
-    <MenuSection @changeMenu="(newMenu) => setMenu(newMenu)"
-      @search="(query) => search(query)" />
+    <MenuSection :darkTheme="darkTheme"
+      @changeMenu="(newMenu) => setMenu(newMenu)"
+      @search="(query) => search(query)"
+      @changeTheme="toggleTheme()" />
 
     <TopAiringSection v-if="menu == 'home'"
       :topAiringList="topAiringList" :loading="loading"
@@ -162,7 +181,7 @@ onMounted(() => {
       @changeEpisode="(id) => getSources(id)"
       @changeQuality="(url) => setHlsSource(url)" />
     
-    <div class="p-2 text-sm text-center">
+    <div class="p-2 text-sm text-center text-gray-800 dark:text-white">
       <p>{{ `&copy; ${getCurrentYear()} ウィブ` }}</p>
     </div>
   </div>

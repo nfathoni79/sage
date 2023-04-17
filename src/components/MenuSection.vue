@@ -1,9 +1,13 @@
 <script setup>
 import { ref } from 'vue'
-import { HomeIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
+import { HomeIcon, MagnifyingGlassIcon, SunIcon, MoonIcon } from '@heroicons/vue/24/outline'
 import AButton from './AButton.vue'
 
-defineEmits(['changeMenu', 'search'])
+defineProps({
+  darkTheme: Boolean,
+})
+
+defineEmits(['changeMenu', 'search', 'changeTheme'])
 
 const searchText = ref('')
 </script>
@@ -20,14 +24,27 @@ const searchText = ref('')
     <div class="grow">
       <form @submit.prevent="$emit('search', searchText)"
         class="relative">
-        <input type="text" placeholder="Search anime..." v-model="searchText"
-          class="block w-full h-10 rounded-full border-gray-300 shadow-sm text-sm
-          focus:border-blue-300 focus:ring focus:ring-blue-200">
-        <AButton @click="$emit('search', searchText)"
+        <input type="text" v-model="searchText"
+          placeholder="Search anime..." required
+          class="block w-full h-10 rounded-full shadow-sm
+          border-gray-300 dark:border-gray-600
+          bg-gray-50 dark:bg-gray-700
+          text-gray-800 dark:text-white dark:placeholder-gray-400 text-sm
+          focus:outline-none focus:border-blue-300 dark:focus:border-blue-500
+          focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-500">
+        <AButton type="submit" @click="$emit('search', searchText)"
           class="absolute top-1/2 -translate-y-1/2 right-0 h-10 w-10">
           <MagnifyingGlassIcon class="w-6 h-6" />
         </AButton>
       </form>
+    </div>
+
+    <div>
+      <AButton :color="darkTheme ? 'orange' : 'black'"
+        @click="$emit('changeTheme')" class="h-10 w-10">
+        <component v-if="darkTheme" :is="SunIcon" class="w-6 h-6" />
+        <component v-else :is="MoonIcon" class="w-6 h-6" />
+      </AButton>
     </div>
   </div>
 </template>

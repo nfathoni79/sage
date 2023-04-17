@@ -58,7 +58,7 @@ watch(() => props.sources, (newSources) => {
 
     <div v-else>
       <!-- Title -->
-      <h1 class="text-xl font-semibold text-gray-800">
+      <h1 class="text-xl font-semibold text-gray-800 dark:text-white">
         {{ animeInfo.title }}
       </h1>
 
@@ -77,7 +77,8 @@ watch(() => props.sources, (newSources) => {
       </div>
 
       <!-- Description -->
-      <p class="mt-4 text-sm text-gray-800 whitespace-pre-line">
+      <p class="mt-4 text-sm text-gray-800 dark:text-gray-400
+        whitespace-pre-line">
         {{ dynamicDescription }}
         <a v-if="animeInfo.description.length > 200"
           @click="short = !short"
@@ -88,12 +89,16 @@ watch(() => props.sources, (newSources) => {
 
       <!-- Episode and Quality -->
       <div class="mt-2 flex items-center gap-2">
-        <label for="episode" class="text-sm font-semibold text-gray-800">
+        <label for="episode"
+          class="text-sm font-semibold text-gray-800 dark:text-white">
           Episode
         </label>
         <select id="episode" class="block w-full h-10
-          rounded-full border-gray-300 shadow-sm text-sm
-        focus:border-blue-300 focus:ring focus:ring-blue-200"
+          rounded-full border-gray-300 dark:border-gray-600 shadow-sm
+          bg-gray-50 dark:bg-gray-700
+          text-gray-800 dark:text-white text-sm
+          focus:outline-none focus:border-blue-300 dark:focus:border-blue-500
+          focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-500"
           v-model="episodeId"
           @change="$emit('changeEpisode', episodeId)">
           <option v-for="episode in animeInfo.episodes" :key="episode.id"
@@ -102,12 +107,16 @@ watch(() => props.sources, (newSources) => {
           </option>
         </select>
 
-        <label for="quality" class="text-sm font-semibold text-gray-800">
+        <label for="quality"
+          class="text-sm font-semibold text-gray-800 dark:text-white">
           Quality
         </label>
         <select id="quality" class="block w-full h-10
-          rounded-full border-gray-300 shadow-sm text-sm
-        focus:border-blue-300 focus:ring focus:ring-blue-200"
+          rounded-full border-gray-300 dark:border-gray-600 shadow-sm
+          bg-gray-50 dark:bg-gray-700
+          text-gray-800 dark:text-white text-sm
+          focus:outline-none focus:border-blue-300 dark:focus:border-blue-500
+          focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-500"
           v-model="quality"
           @change="$emit('changeQuality', streamUrl)">
           <option v-for="source in sources" :key="source.quality"

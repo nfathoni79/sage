@@ -12,7 +12,8 @@ defineEmits(['selectAnime'])
 
 <template>
   <div class="p-2">
-    <h1 class="text-xl font-semibold text-gray-800 text-center">
+    <h1 class="text-xl font-semibold
+      text-gray-800 dark:text-white text-center">
       Top Airing Anime
     </h1>
 
