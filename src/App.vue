@@ -150,6 +150,16 @@ onMounted(() => {
     }
   })
 
+  plyrPlayer.value.on('enterfullscreen', () => {
+    screen.orientation.lock('landscape').catch(error => {
+      console.log(error)
+    })
+  })
+
+  plyrPlayer.value.on('exitfullscreen', () => {
+    screen.orientation.unlock()
+  })
+
   darkTheme.value = JSON.parse(localStorage.getItem('darkTheme')) === true
   if (darkTheme.value) document.documentElement.className = 'dark'
 })
