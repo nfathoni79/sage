@@ -1,6 +1,8 @@
 <script setup>
 import { computed } from 'vue'
+import { BookmarkSlashIcon } from '@heroicons/vue/24/outline'
 import ABadge from './ABadge.vue'
+import AButton from './AButton.vue'
 import LoadingImage from './LoadingImage.vue'
 
 const props = defineProps({
@@ -8,11 +10,19 @@ const props = defineProps({
   title: String,
   image: String,
   genres: Array,
+  deleteBtn: Boolean,
 })
+
+const emit = defineEmits(['clickDelete'])
 
 const shortTitle = computed(() => {
   return props.title.substring(0, 36) + (props.title.length > 36 ? '...' : '')
 })
+
+const handleDelete = event => {
+  event.stopPropagation()
+  emit('clickDelete')
+}
 </script>
 
 <template>
@@ -21,10 +31,16 @@ const shortTitle = computed(() => {
     border border-gray-200 dark:border-gray-700
     bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700
     overflow-hidden cursor-pointer">
-    <div class="w-full aspect-square
+    <div class="relative w-full aspect-square
       flex items-center justify-center bg-blue-100">
       <LoadingImage :url="image" :name="shortTitle"
         className="aspect-square object-cover" />
+      
+      <AButton v-if="deleteBtn" color="red"
+        @click.prevent="event => handleDelete(event)"
+        class="absolute top-2 right-2">
+        <BookmarkSlashIcon class="w-6 h-6" />
+      </AButton>
     </div>
 
     <div class="p-2">

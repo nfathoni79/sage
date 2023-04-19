@@ -1,6 +1,12 @@
 <script setup>
 import { ref } from 'vue'
-import { HomeIcon, MagnifyingGlassIcon, SunIcon, MoonIcon } from '@heroicons/vue/24/outline'
+import {
+  HomeIcon,
+  MagnifyingGlassIcon,
+  SunIcon,
+  MoonIcon,
+  BookmarkSquareIcon
+} from '@heroicons/vue/24/outline'
 import AButton from './AButton.vue'
 
 defineProps({
@@ -14,12 +20,10 @@ const searchText = ref('')
 
 <template>
   <div class="flex gap-2 p-2">
-    <div class="">
-      <AButton @click="$emit('changeMenu', 'home')"
-        class="h-10 w-10">
-        <HomeIcon class="w-6 h-6" />
-      </AButton>
-    </div>
+    <AButton @click="$emit('changeMenu', 'home')"
+      class="h-10 w-10">
+      <HomeIcon class="w-6 h-6" />
+    </AButton>
 
     <div class="grow">
       <form @submit.prevent="$emit('search', searchText)"
@@ -39,12 +43,14 @@ const searchText = ref('')
       </form>
     </div>
 
-    <div>
-      <AButton :color="darkTheme ? 'orange' : 'black'"
-        @click="$emit('changeTheme')" class="h-10 w-10">
-        <component v-if="darkTheme" :is="SunIcon" class="w-6 h-6" />
-        <component v-else :is="MoonIcon" class="w-6 h-6" />
-      </AButton>
-    </div>
+    <AButton
+      @click="$emit('changeMenu', 'watchlist')" class="h-10 w-10">
+      <BookmarkSquareIcon class="w-6 h-6" />
+    </AButton>
+
+    <AButton :color="darkTheme ? 'orange' : 'black'"
+      @click="$emit('changeTheme')" class="h-10 w-10">
+      <component :is="darkTheme ? SunIcon : MoonIcon" class="w-6 h-6" />
+    </AButton>
   </div>
 </template>

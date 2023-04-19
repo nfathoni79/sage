@@ -8,6 +8,7 @@ import MenuSection from './components/MenuSection.vue'
 import TopAiringSection from './components/TopAiringSection.vue'
 import SearchSection from './components/SearchSection.vue'
 import AnimeInfoSection from './components/AnimeInfoSection.vue'
+import WatchlistSection from './components/WatchlistSection.vue'
 
 import AnimeService from './services/AnimeService'
 
@@ -19,6 +20,7 @@ const darkTheme = ref(false)
 
 const topAiringList = ref([])
 const searchList = ref([])
+const watchList = ref([])
 const animeInfo = ref(null)
 const sources = ref([])
 
@@ -33,11 +35,19 @@ const plyrCurrentTime = ref(0)
 
 let hls = new Hls()
 
+const animeInfoId = computed(() => {
+  return (animeInfo.value == null) ? null : animeInfo.value.id
+})
+
 const plyrPlayer = computed(() => {
   return plyrParent.value.plyr.player
 })
 
-const setMenu = (newMenu) => menu.value = newMenu 
+const setMenu = newMenu => {
+  menu.value = newMenu
+
+  if (newMenu == 'watchlist') getWatchlist()
+} 
 
 const getTopAiring = () => {
   loading.value =  true
@@ -90,7 +100,37 @@ const getAnimeInfo = (id) => {
     })
 }
 
-const getSources = (episodeId) => {
+const getWatchlist = () => {
+  watchList.value = []
+  const watchlistStr = localStorage.getItem('watchlist')
+
+  if (watchlistStr != null) {
+    watchList.value = JSON.parse(watchlistStr)
+  }
+}
+
+const isInWatchlist = (id) => {
+  if (id == null) return false
+
+  const index = watchList.value.findIndex(item => {
+    return item.id == id
+  })
+
+  return index > -1
+}
+
+const getSources = (episodeId, animeId) => {
+  // Check if anime in watchlist
+  const index = watchList.value.findIndex(item => {
+    return item.id == animeId
+  })
+
+  // Update last episode in watchlist if exist
+  if (index > -1) {
+    watchList.value[index].lastEpisodeId = episodeId
+    localStorage.setItem('watchlist', JSON.stringify(watchList.value))
+  }
+
   sources.value = []
   sourceSet.value = false
   plyrCurrentTime.value =  0
@@ -133,6 +173,33 @@ const toggleTheme = () => {
   localStorage.setItem('darkTheme', darkTheme.value)
 }
 
+const getLastEpisodeId = (animeId) => {
+  if (animeId == null) return null
+
+  const filtered = watchList.value.filter(item => {
+    return item.id == animeId
+  })
+
+  return (filtered.length > 0) ? filtered[0].lastEpisodeId : null
+}
+
+const toggleWatchlist = (id, title, image) => {
+  // Check if anime in watchlist
+  const index = watchList.value.findIndex(item => {
+    return item.id == id
+  })
+
+  // Remove if exist, else add
+  if (index > -1) {
+    watchList.value.splice(index, 1)
+  } else {
+    watchList.value.push({ id, title, image, lastEpisodeId: null })
+  }
+
+  // Update localStorage
+  localStorage.setItem('watchlist', JSON.stringify(watchList.value))
+}
+
 onMounted(() => {
   window.addEventListener( 'load', () => {
     windowLoaded.value = true
@@ -170,7 +237,7 @@ onMounted(() => {
     <Preloader :active="!windowLoaded" />
     
     <VideoSection ref="plyrParent"
-      :active="menu != 'home' && menu != 'search'" :sourceSet="sourceSet"
+      :active="menu == 'info'" :sourceSet="sourceSet"
       :plyrOptions="plyrOptions" />
 
     <MenuSection :darkTheme="darkTheme"
@@ -188,8 +255,16 @@ onMounted(() => {
 
     <AnimeInfoSection v-if="menu == 'info'"
       :animeInfo="animeInfo" :sources="sources" :loading="loading"
-      @changeEpisode="(id) => getSources(id)"
-      @changeQuality="(url) => setHlsSource(url)" />
+      :inWatchlist="isInWatchlist(animeInfoId)"
+      :lastEpisodeId="getLastEpisodeId(animeInfoId)"
+      @changeEpisode="({ episodeId, animeId }) => getSources(episodeId, animeId)"
+      @changeQuality="(url) => setHlsSource(url)"
+      @toggleWatchlist="({ id, title, image }) => toggleWatchlist(id, title, image)" />
+
+    <WatchlistSection v-if="menu == 'watchlist'"
+      :watchList="watchList" :loading="loading"
+      @selectAnime="(id) => getAnimeInfo(id)"
+      @clickDelete="(id) => toggleWatchlist(id, '', '')" />
     
     <div class="p-2 text-sm text-center text-gray-800 dark:text-white">
       <p>{{ `&copy; ${getCurrentYear()} ウィブ` }}</p>

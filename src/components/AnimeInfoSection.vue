@@ -1,15 +1,19 @@
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { BookmarkIcon, BookmarkSlashIcon } from '@heroicons/vue/24/outline'
 import Spinner from './Spinner.vue'
 import ABadge from './ABadge.vue'
+import AButton from './AButton.vue'
 
 const props = defineProps({
   animeInfo: Object,
   sources: Array,
   loading: Boolean,
+  inWatchlist: Boolean,
+  lastEpisodeId: String,
 })
 
-const emit = defineEmits(['changeEpisode', 'changeQuality'])
+const emit = defineEmits(['changeEpisode', 'changeQuality', 'toggleWatchlist'])
 
 const short = ref(true)
 const episodeId = ref(null)
@@ -39,8 +43,15 @@ const streamUrl = computed(() => {
 
 watch(() => props.animeInfo, (newAnimeInfo) => {
   if (newAnimeInfo != null) {
-    episodeId.value = newAnimeInfo.episodes[0].id
-    emit('changeEpisode', episodeId.value)
+    // Set last episode id from watchlist if exist
+    episodeId.value = (props.lastEpisodeId == null)
+      ? newAnimeInfo.episodes[0].id
+      : props.lastEpisodeId
+
+    emit('changeEpisode', {
+      episodeId: episodeId.value,
+      animeId: newAnimeInfo.id,
+    })
   }
 })
 
@@ -50,6 +61,14 @@ watch(() => props.sources, (newSources) => {
     emit('changeQuality', streamUrl.value)
   }
 })
+
+const handleWatchlist = () => {
+  emit('toggleWatchlist', {
+    id: props.animeInfo.id,
+    title: props.animeInfo.title,
+    image: props.animeInfo.image,
+  })
+}
 </script>
 
 <template>
@@ -58,9 +77,17 @@ watch(() => props.sources, (newSources) => {
 
     <div v-else>
       <!-- Title -->
-      <h1 class="text-xl font-semibold text-gray-800 dark:text-white">
-        {{ animeInfo.title }}
-      </h1>
+      <div class="flex items-center gap-2">
+        <h1 class="grow text-xl font-semibold text-gray-800 dark:text-white">
+          {{ animeInfo.title }}
+        </h1>
+
+        <AButton :color="inWatchlist ? 'red' : 'green'"
+          @click="handleWatchlist()">
+          <component :is="inWatchlist ? BookmarkSlashIcon : BookmarkIcon"
+            class="w-6 h-6" />
+        </AButton>
+      </div>
 
       <!-- Type and status -->
       <div class="mt-2 space-x-1">
@@ -100,7 +127,7 @@ watch(() => props.sources, (newSources) => {
           focus:outline-none focus:border-blue-300 dark:focus:border-blue-500
           focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-500"
           v-model="episodeId"
-          @change="$emit('changeEpisode', episodeId)">
+          @change="$emit('changeEpisode', { episodeId, animeId: animeInfo.id })">
           <option v-for="episode in animeInfo.episodes" :key="episode.id"
             :value="episode.id">
             {{ episode.number }}

@@ -15,6 +15,20 @@ const colorClasses = computed(() => {
         text-blue-50
         focus:ring-blue-300 dark:focus:ring-blue-500
       `
+    case 'red':
+      return cntl`
+        bg-red-500 dark:bg-red-600
+        hover:bg-red-600 dark:hover:bg-red-700
+        text-red-50
+        focus:ring-red-300 dark:focus:ring-red-500
+      `
+    case 'green':
+      return cntl`
+        bg-green-500 dark:bg-green-600
+        hover:bg-green-600 dark:hover:bg-green-700
+        text-green-50
+        focus:ring-green-300 dark:focus:ring-green-500
+      `
     case 'orange':
       return cntl`
         bg-orange-500 dark:bg-orange-600
