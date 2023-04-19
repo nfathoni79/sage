@@ -45,8 +45,6 @@ const plyrPlayer = computed(() => {
 
 const setMenu = newMenu => {
   menu.value = newMenu
-
-  if (newMenu == 'watchlist') getWatchlist()
 } 
 
 const getTopAiring = () => {
@@ -204,6 +202,7 @@ onMounted(() => {
   window.addEventListener( 'load', () => {
     windowLoaded.value = true
     getTopAiring()
+    getWatchlist()
   })
 
   plyrPlayer.value.on('loadeddata', () => {
