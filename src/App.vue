@@ -150,7 +150,7 @@ const setHlsSource = (source) => {
 
     hls.destroy()
     hls = new Hls()
-    hls.loadSource(`https://corsbypass.herokuapp.com/${source}`)
+    hls.loadSource(`https://rich-long-underwear-yak.cyclic.app/${source}`)
     hls.attachMedia(plyrPlayer.value.media)
     window.hls = hls
   }
