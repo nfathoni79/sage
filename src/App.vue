@@ -150,7 +150,7 @@ const setHlsSource = (source) => {
 
     hls.destroy()
     hls = new Hls()
-    hls.loadSource(`https://rich-long-underwear-yak.cyclic.app/${source}`)
+    hls.loadSource(`https://anime.sahabatgemarikan.id/cors/${source}`)
     hls.attachMedia(plyrPlayer.value.media)
     window.hls = hls
   }
