@@ -15,6 +15,13 @@ const colorClasses = computed(() => {
         text-blue-50
         focus:ring-blue-300 dark:focus:ring-blue-500
       `
+    case 'cyan':
+      return cntl`
+        bg-cyan-500 dark:bg-cyan-600
+        hover:bg-cyan-600 dark:hover:bg-cyan-700
+        text-cyan-50
+        focus:ring-cyan-300 dark:focus:ring-cyan-500
+      `
     case 'red':
       return cntl`
         bg-red-500 dark:bg-red-600

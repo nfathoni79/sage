@@ -17,6 +17,9 @@ const windowLoaded = ref(false)
 const loading = ref(false)
 const sourceSet = ref(false)
 const darkTheme = ref(false)
+const showControls = ref(false)
+const showControlsTimeout = ref(null)
+const playing = ref(false)
 
 const topAiringList = ref([])
 const searchList = ref([])
@@ -30,6 +33,12 @@ const plyrOptions = {
     'play-large', 'rewind', 'play', 'fast-forward', 'progress', 'current-time',
     'mute', 'volume', 'fullscreen'
   ],
+  fullscreen: {
+    enabled: true,
+    fallback: true,
+    iosNative: true,
+    container: '#custom-control-wrapper',
+  },
 }
 const plyrCurrentTime = ref(0)
 
@@ -198,6 +207,31 @@ const toggleWatchlist = (id, title, image) => {
   localStorage.setItem('watchlist', JSON.stringify(watchList.value))
 }
 
+const resetShowControlsTimeout = () => {
+  showControls.value = true
+
+  clearTimeout(showControlsTimeout.value)
+
+  showControlsTimeout.value = setTimeout(() => {
+    showControls.value = false
+  }, 3000)
+}
+
+const rewind = () => {
+  resetShowControlsTimeout()
+  plyrPlayer.value.rewind(10)
+}
+
+const forward = () => {
+  resetShowControlsTimeout()
+  plyrPlayer.value.forward(10)
+}
+
+const pause = () => {
+  resetShowControlsTimeout()
+  plyrPlayer.value.pause()
+}
+
 onMounted(() => {
   window.addEventListener( 'load', () => {
     windowLoaded.value = true
@@ -226,6 +260,18 @@ onMounted(() => {
     screen.orientation.unlock()
   })
 
+  plyrPlayer.value.on('controlsshown', () => {
+    resetShowControlsTimeout()
+  })
+
+  plyrPlayer.value.on('playing', () => {
+    playing.value = true
+  })
+
+  plyrPlayer.value.on('pause', () => {
+    playing.value = false
+  })
+
   darkTheme.value = JSON.parse(localStorage.getItem('darkTheme')) === true
   if (darkTheme.value) document.documentElement.className = 'dark'
 })
@@ -237,7 +283,8 @@ onMounted(() => {
     
     <VideoSection ref="plyrParent"
       :active="menu == 'info'" :sourceSet="sourceSet"
-      :plyrOptions="plyrOptions" />
+      :plyrOptions="plyrOptions" :showControls="showControls" :playing="playing"
+      @rewind="rewind()" @forward="forward()" @pause="pause()" />
 
     <MenuSection :darkTheme="darkTheme"
       @changeMenu="(newMenu) => setMenu(newMenu)"
