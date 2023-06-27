@@ -19,7 +19,8 @@ defineEmits(['selectAnime'])
 
     <Spinner v-if="loading" class="mt-4 mx-auto h-8 w-8 text-blue-600" />
     
-    <div v-else class="mt-4 grid grid-cols-2 gap-2">
+    <div v-else class="mt-4 grid grid-cols-2 sm:grid-cols-3
+      md:grid-cols-4 lg:grid-cols-5 gap-2">
       <AnimeCard v-for="item in topAiringList" :key="item.id"
         :id="item.id" :title="item.title"
         :image="item.image" :genres="item.genres"

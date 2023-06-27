@@ -72,7 +72,7 @@ const handleWatchlist = () => {
 </script>
 
 <template>
-  <div class="p-2">
+  <div class="mx-auto max-w-md p-2">
     <Spinner v-if="loading" class="mt-4 mx-auto h-8 w-8 text-blue-600" />
 
     <div v-else>

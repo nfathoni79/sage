@@ -278,7 +278,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="mx-auto max-w-md bg-white dark:bg-gray-900">
+  <div class="mx-auto max-w-6xl bg-white dark:bg-gray-900">
     <Preloader :active="!windowLoaded" />
     
     <VideoSection ref="plyrParent"

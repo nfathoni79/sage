@@ -19,7 +19,7 @@ const searchText = ref('')
 </script>
 
 <template>
-  <div class="flex gap-2 p-2">
+  <div class="mx-auto max-w-md flex gap-2 p-2">
     <AButton @click="$emit('changeMenu', 'home')"
       class="h-10 w-10">
       <HomeIcon class="w-6 h-6" />

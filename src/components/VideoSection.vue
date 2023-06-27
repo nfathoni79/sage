@@ -20,7 +20,8 @@ defineExpose({ plyr })
 </script>
 
 <template>
-  <div class="w-full aspect-video flex items-center justify-center
+  <div class="mx-auto max-w-md w-full aspect-video
+    flex items-center justify-center
     bg-[url('/img/sage.png')] bg-cover bg-no-repeat">
     <Spinner v-if="active && !sourceSet" class="h-8 w-8 text-blue-600" />
     

@@ -22,7 +22,8 @@ defineEmits(['selectAnime', 'clickDelete'])
 
     <div v-else>
       <!-- Cards -->
-      <div class="mt-4 grid grid-cols-2 gap-2">
+      <div class="mt-4 grid grid-cols-2 sm:grid-cols-3
+        md:grid-cols-4 lg:grid-cols-5 gap-2">
         <AnimeCard v-for="item in watchList" :key="item.id"
           :id="item.id" :title="item.title"
           :image="item.image" :genres="[]" :deleteBtn="true"
