@@ -159,7 +159,7 @@ const setHlsSource = (source) => {
 
     hls.destroy()
     hls = new Hls()
-    hls.loadSource(`https://anime.sahabatgemarikan.id/cors/${source}`)
+    hls.loadSource(`${import.meta.env.VITE_CORS_BASE_URL}${source}`)
     hls.attachMedia(plyrPlayer.value.media)
     window.hls = hls
   }
