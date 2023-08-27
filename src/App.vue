@@ -98,6 +98,7 @@ const getAnimeInfo = (id) => {
   AnimeService.getAnimeInfo(id)
     .then((response) => {
       animeInfo.value = response.data
+      animeInfo.value.id = id
     }) 
     .catch((error) => {
       console.log(error)
