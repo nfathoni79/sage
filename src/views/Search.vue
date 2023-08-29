@@ -1,22 +1,39 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 
-import AnimeCard from './AnimeCard.vue'
-import Spinner from './Spinner.vue'
-import ARadioGroup from './ARadioGroup.vue'
+import AnimeCard from '../components/AnimeCard.vue'
+import Spinner from '../components/Spinner.vue'
+import ARadioGroup from '../components/ARadioGroup.vue'
+
+import AnimeService from '../services/AnimeService'
 
 const props = defineProps({
-  searchList: Array,
-  loading: Boolean,
+  windowLoaded: Boolean,
 })
 
-defineEmits(['selectAnime'])
+const route = useRoute()
+
+const searchList = ref([])
+const loading = ref(false)
 
 const audio = ref('All')
 const audioOptions = ['All', 'JP', 'EN']
 
+onMounted(() => {
+  if (props.windowLoaded) search()
+})
+
+watch(() => props.windowLoaded, newValue => {
+  if (newValue) search()
+})
+
+watch(route, newRoute => {
+  if (newRoute) search()
+})
+
 const filteredSearchList = computed(() => {
-  return props.searchList.filter((item) => {
+  return searchList.value.filter(item => {
     switch (audio.value) {
       case 'All':
         return true
@@ -29,6 +46,27 @@ const filteredSearchList = computed(() => {
     }
   })
 })
+
+/**
+ * Search anime.
+ */
+const search = () => {
+  if (!route.query.q) return
+
+  loading.value = true
+  searchList.value = []
+
+  AnimeService.search(route.query.q)
+    .then(response => {
+      searchList.value = response.data.results
+    }) 
+    .catch(error => {
+      console.log(error)
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
 </script>
 
 <template>
@@ -59,7 +97,7 @@ const filteredSearchList = computed(() => {
       <div class="mt-4 grid grid-cols-2 sm:grid-cols-3
         md:grid-cols-4 lg:grid-cols-5 gap-2">
         <AnimeCard v-for="item in filteredSearchList" :key="item.id"
-          @click="$emit('selectAnime', item.id)"
+          @click="$router.push({ name: 'anime', params: { id: item.id } })"
           :id="item.id" :title="item.title"
           :image="item.image" :genres="[]" />
       </div>

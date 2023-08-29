@@ -5,28 +5,19 @@ import Hls from 'hls.js/dist/hls.min'
 import Preloader from './components/Preloader.vue'
 import VideoSection from './components/VideoSection.vue'
 import MenuSection from './components/MenuSection.vue'
-import TopAiringSection from './components/TopAiringSection.vue'
-import SearchSection from './components/SearchSection.vue'
-import AnimeInfoSection from './components/AnimeInfoSection.vue'
-import WatchlistSection from './components/WatchlistSection.vue'
 
-import AnimeService from './services/AnimeService'
-
-const menu = ref('home')
-const windowLoaded = ref(false)
-const loading = ref(false)
-const sourceSet = ref(false)
-const darkTheme = ref(false)
-const showControls = ref(false)
+const watchlist = ref([])
+const animeId = ref(null)
 const showControlsTimeout = ref(null)
+
+// Flags
+const windowLoaded = ref(false)
+const playerActive = ref(false)
+const sourceSet = ref(false)
 const playing = ref(false)
+const showControls = ref(false)
 
-const topAiringList = ref([])
-const searchList = ref([])
-const watchList = ref([])
-const animeInfo = ref(null)
-const sources = ref([])
-
+// Plyr
 const plyrParent = ref(null)
 const plyrOptions = {
   controls: [
@@ -42,201 +33,46 @@ const plyrOptions = {
 }
 const plyrCurrentTime = ref(0)
 
+// HLS
 let hls = new Hls()
 
-const animeInfoId = computed(() => {
-  return (animeInfo.value == null) ? null : animeInfo.value.id
-})
-
+/**
+ * Plyr player instance.
+ */
 const plyrPlayer = computed(() => {
   return plyrParent.value.plyr.player
 })
 
-const setMenu = newMenu => {
-  menu.value = newMenu
-} 
+/**
+ * Is current anime in Watchlist.
+ */
+const inWatchlist = computed(() => {
+  if (animeId.value == null) return false
 
-const getTopAiring = () => {
-  loading.value =  true
-
-  AnimeService.getTopAiring()
-    .then((response) => {
-      topAiringList.value = response.data.results
-    }) 
-    .catch((error) => {
-      console.log(error)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
-const search = (query) => {
-  if (query == '') return
-
-  menu.value = 'search'
-  loading.value = true
-  searchList.value = []
-
-  AnimeService.search(query)
-    .then((response) => {
-      searchList.value = response.data.results
-    }) 
-    .catch((error) => {
-      console.log(error)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
-const getAnimeInfo = (id) => {
-  menu.value = 'info'
-  loading.value = true
-  animeInfo.value = null
-
-  AnimeService.getAnimeInfo(id)
-    .then((response) => {
-      animeInfo.value = response.data
-      animeInfo.value.id = id
-    }) 
-    .catch((error) => {
-      console.log(error)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
-const getWatchlist = () => {
-  watchList.value = []
-  const watchlistStr = localStorage.getItem('watchlist')
-
-  if (watchlistStr != null) {
-    watchList.value = JSON.parse(watchlistStr)
-  }
-}
-
-const isInWatchlist = (id) => {
-  if (id == null) return false
-
-  const index = watchList.value.findIndex(item => {
-    return item.id == id
+  const index = watchlist.value.findIndex(item => {
+    return item.id == animeId.value
   })
 
   return index > -1
-}
+})
 
-const getSources = (episodeId, animeId) => {
-  // Check if anime in watchlist
-  const index = watchList.value.findIndex(item => {
-    return item.id == animeId
+/**
+ * Last Episode ID from Watchlist.
+ * If none in Watchlist, return empty string.
+ */
+const lastEpisodeId = computed(() => {
+  if (animeId.value == null) return null
+
+  const filtered = watchlist.value.filter(item => {
+    return item.id == animeId.value
   })
 
-  // Update last episode in watchlist if exist
-  if (index > -1) {
-    watchList.value[index].lastEpisodeId = episodeId
-    localStorage.setItem('watchlist', JSON.stringify(watchList.value))
-  }
-
-  sources.value = []
-  sourceSet.value = false
-  plyrCurrentTime.value =  0
-
-  AnimeService.getStreamLink(episodeId)
-    .then((response) => {
-      sources.value = response.data.sources.filter((source) => {
-        return source.quality != 'backup' && source.quality != 'default'
-      })
-    }) 
-    .catch((error) => {
-      console.log(error)
-    })
-}
-
-const setHlsSource = (source) => {
-  if (Hls.isSupported()) {
-    sourceSet.value = false
-
-    hls.destroy()
-    hls = new Hls()
-    hls.loadSource(`${import.meta.env.VITE_CORS_BASE_URL}${source}`)
-    hls.attachMedia(plyrPlayer.value.media)
-    window.hls = hls
-  }
-}
-
-const getCurrentYear = () => {
-  return new Date().getFullYear()
-}
-
-const toggleTheme = () => {
-  if (darkTheme.value) {
-    document.documentElement.className = ''
-  } else {
-    document.documentElement.className = 'dark'
-  }
-
-  darkTheme.value = !darkTheme.value
-  localStorage.setItem('darkTheme', darkTheme.value)
-}
-
-const getLastEpisodeId = (animeId) => {
-  if (animeId == null) return null
-
-  const filtered = watchList.value.filter(item => {
-    return item.id == animeId
-  })
-
-  return (filtered.length > 0) ? filtered[0].lastEpisodeId : null
-}
-
-const toggleWatchlist = (id, title, image) => {
-  // Check if anime in watchlist
-  const index = watchList.value.findIndex(item => {
-    return item.id == id
-  })
-
-  // Remove if exist, else add
-  if (index > -1) {
-    watchList.value.splice(index, 1)
-  } else {
-    watchList.value.push({ id, title, image, lastEpisodeId: null })
-  }
-
-  // Update localStorage
-  localStorage.setItem('watchlist', JSON.stringify(watchList.value))
-}
-
-const resetShowControlsTimeout = () => {
-  showControls.value = true
-
-  clearTimeout(showControlsTimeout.value)
-
-  showControlsTimeout.value = setTimeout(() => {
-    showControls.value = false
-  }, 3000)
-}
-
-const rewind = () => {
-  resetShowControlsTimeout()
-  plyrPlayer.value.rewind(10)
-}
-
-const forward = () => {
-  resetShowControlsTimeout()
-  plyrPlayer.value.forward(10)
-}
-
-const pause = () => {
-  resetShowControlsTimeout()
-  plyrPlayer.value.pause()
-}
+  return (filtered.length > 0) ? filtered[0].lastEpisodeId : ''
+})
 
 onMounted(() => {
   window.addEventListener( 'load', () => {
     windowLoaded.value = true
-    getTopAiring()
     getWatchlist()
   })
 
@@ -272,10 +108,129 @@ onMounted(() => {
   plyrPlayer.value.on('pause', () => {
     playing.value = false
   })
-
-  darkTheme.value = JSON.parse(localStorage.getItem('darkTheme')) === true
-  if (darkTheme.value) document.documentElement.className = 'dark'
 })
+
+/**
+ * Get Watchlist anime.
+ */
+const getWatchlist = () => {
+  watchlist.value = []
+  const watchlistStr = localStorage.getItem('watchlist')
+
+  if (watchlistStr != null) {
+    watchlist.value = JSON.parse(watchlistStr)
+  }
+}
+
+/**
+ * Toggle add or remove anime to Watchlist.
+ * @param {String} id - Anime ID. 
+ * @param {String} title - Anime title. 
+ * @param {String} image - Anime image URL. 
+ */
+const toggleWatchlist = (id, title, image) => {
+  // Check if anime in watchlist
+  const index = watchlist.value.findIndex(item => {
+    return item.id == id
+  })
+
+  // Remove if exist, else add
+  if (index > -1) {
+    watchlist.value.splice(index, 1)
+  } else {
+    watchlist.value.push({ id, title, image, lastEpisodeId: null })
+  }
+
+  // Update localStorage
+  localStorage.setItem('watchlist', JSON.stringify(watchlist.value))
+}
+
+/**
+ * Set anime ID from child.
+ * @param {String} id - Anime ID>
+ */
+const setAnimeId = (id) => animeId.value = id
+
+/**
+ * Update Watchlist and player when episode changed.
+ * @param {String} id - Episode ID. 
+ */
+const onChangeEpisode = (id) => {
+  // Check if anime in watchlist
+  const index = watchlist.value.findIndex(item => {
+    return item.id == animeId.value
+  })
+
+  // Update last episode in watchlist if exist
+  if (index > -1) {
+    watchlist.value[index].lastEpisodeId = id
+    localStorage.setItem('watchlist', JSON.stringify(watchlist.value))
+  }
+
+  playerActive.value = true
+  sourceSet.value = false
+  plyrCurrentTime.value = 0
+}
+
+/**
+ * Set HLS video source.
+ * @param {String} streamUrl - Video stream URL.
+ */
+const setHlsSource = (streamUrl) => {
+  if (Hls.isSupported()) {
+    sourceSet.value = false
+
+    hls.destroy()
+    hls = new Hls()
+    hls.loadSource(`${import.meta.env.VITE_CORS_BASE_URL}${streamUrl}`)
+    hls.attachMedia(plyrPlayer.value.media)
+    window.hls = hls
+  }
+}
+
+/**
+ * Reset the timeout of custom controls.
+ */
+const resetShowControlsTimeout = () => {
+  showControls.value = true
+
+  clearTimeout(showControlsTimeout.value)
+
+  showControlsTimeout.value = setTimeout(() => {
+    showControls.value = false
+  }, 3000)
+}
+
+/**
+ * Rewind playback from custom controls.
+ */
+const rewind = () => {
+  resetShowControlsTimeout()
+  plyrPlayer.value.rewind(10)
+}
+
+/**
+ * Forward playback from custom controls.
+ */
+const forward = () => {
+  resetShowControlsTimeout()
+  plyrPlayer.value.forward(10)
+}
+
+/**
+ * Pause playback from custom controls.
+ */
+const pause = () => {
+  resetShowControlsTimeout()
+  plyrPlayer.value.pause()
+}
+
+/**
+ * Get current year.
+ */
+const getCurrentYear = () => {
+  return new Date().getFullYear()
+}
 </script>
 
 <template>
@@ -283,35 +238,19 @@ onMounted(() => {
     <Preloader :active="!windowLoaded" />
     
     <VideoSection ref="plyrParent"
-      :active="menu == 'info'" :sourceSet="sourceSet"
-      :plyrOptions="plyrOptions" :showControls="showControls" :playing="playing"
+      :active="playerActive" :sourceSet="sourceSet" :plyrOptions="plyrOptions"
+      :showControls="showControls" :playing="playing"
       @rewind="rewind()" @forward="forward()" @pause="pause()" />
 
-    <MenuSection :darkTheme="darkTheme"
-      @changeMenu="(newMenu) => setMenu(newMenu)"
-      @search="(query) => search(query)"
-      @changeTheme="toggleTheme()" />
-
-    <TopAiringSection v-if="menu == 'home'"
-      :topAiringList="topAiringList" :loading="loading"
-      @selectAnime="(id) => getAnimeInfo(id)" />
-
-    <SearchSection v-if="menu == 'search'"
-      :searchList="searchList" :loading="loading"
-      @selectAnime="(id) => getAnimeInfo(id)" />
-
-    <AnimeInfoSection v-if="menu == 'info'"
-      :animeInfo="animeInfo" :sources="sources" :loading="loading"
-      :inWatchlist="isInWatchlist(animeInfoId)"
-      :lastEpisodeId="getLastEpisodeId(animeInfoId)"
-      @changeEpisode="({ episodeId, animeId }) => getSources(episodeId, animeId)"
-      @changeQuality="(url) => setHlsSource(url)"
+    <MenuSection />
+    
+    <router-view :windowLoaded="windowLoaded" :watchlist="watchlist"
+      :inWatchlist="inWatchlist" :lastEpisodeId="lastEpisodeId"
+      @mountAnime="animeId => setAnimeId(animeId)"
+      @changeEpisode="episodeId => onChangeEpisode(episodeId)"
+      @changeQuality="streamUrl => setHlsSource(streamUrl)"
+      @removeWatchlist="id => toggleWatchlist(id, '', '')"
       @toggleWatchlist="({ id, title, image }) => toggleWatchlist(id, title, image)" />
-
-    <WatchlistSection v-if="menu == 'watchlist'"
-      :watchList="watchList" :loading="loading"
-      @selectAnime="(id) => getAnimeInfo(id)"
-      @clickDelete="(id) => toggleWatchlist(id, '', '')" />
     
     <div class="p-2 text-sm text-center text-gray-800 dark:text-white">
       <p>{{ `&copy; ${getCurrentYear()} ウィブ` }}</p>

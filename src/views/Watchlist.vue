@@ -1,11 +1,19 @@
 <script setup>
-import AnimeCard from './AnimeCard.vue'
+import AnimeCard from '../components/AnimeCard.vue'
 
 const props = defineProps({
-  watchList: Array,
+  watchlist: Array,
 })
 
-defineEmits(['selectAnime', 'clickDelete'])
+const emit = defineEmits(['removeWatchlist'])
+
+/**
+ * Remove an anime from Watchlist.
+ * @param {String} id - Anime ID. 
+ */
+const removeWatchlist = (id) => {
+  emit('removeWatchlist', id)
+}
 </script>
 
 <template>
@@ -15,7 +23,7 @@ defineEmits(['selectAnime', 'clickDelete'])
       Watchlist
     </h1>
 
-    <p v-if="watchList.length <= 0"
+    <p v-if="watchlist.length <= 0"
       class="mt-4 text-gray-800 dark:text-white text-center">
       No anime to watch yet
     </p>
@@ -24,11 +32,11 @@ defineEmits(['selectAnime', 'clickDelete'])
       <!-- Cards -->
       <div class="mt-4 grid grid-cols-2 sm:grid-cols-3
         md:grid-cols-4 lg:grid-cols-5 gap-2">
-        <AnimeCard v-for="item in watchList" :key="item.id"
+        <AnimeCard v-for="item in watchlist" :key="item.id"
           :id="item.id" :title="item.title"
           :image="item.image" :genres="[]" :deleteBtn="true"
-          @click="$emit('selectAnime', item.id)"
-          @clickDelete="$emit('clickDelete', item.id)" />
+          @click="$router.push({ name: 'anime', params: { id: item.id } })"
+          @clickDelete="removeWatchlist(item.id)" />
       </div>
     </div>
   </div>
