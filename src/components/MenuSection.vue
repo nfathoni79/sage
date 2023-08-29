@@ -35,10 +35,11 @@ const toggleTheme = () => {
 </script>
 
 <template>
-  <div class="mx-auto max-w-md flex gap-2 p-2">
+  <div class="mx-auto max-w-4xl flex gap-2 p-2">
     <AButton @click="$router.push({ name: 'home' })"
-      class="h-10 w-10">
+      class="h-10 w-10 md:w-auto md:px-4">
       <HomeIcon class="w-6 h-6" />
+      <span class="hidden md:inline ml-2">Home</span>
     </AButton>
 
     <div class="grow">
@@ -60,14 +61,18 @@ const toggleTheme = () => {
       </form>
     </div>
 
-    <AButton
-      @click="$router.push({ name: 'watchlist' })" class="h-10 w-10">
+    <AButton @click="$router.push({ name: 'watchlist' })"
+      class="h-10 w-10 md:w-auto md:px-4">
       <BookmarkSquareIcon class="w-6 h-6" />
+      <span class="hidden md:inline ml-2">Watchlist</span>
     </AButton>
 
     <AButton :color="darkTheme ? 'orange' : 'black'"
-      @click="toggleTheme()" class="h-10 w-10">
+      @click="toggleTheme()" class="h-10 w-10 lg:w-auto lg:px-4">
       <component :is="darkTheme ? SunIcon : MoonIcon" class="w-6 h-6" />
+      <span class="hidden lg:inline ml-2">
+        {{ darkTheme ? 'Light' : 'Dark' }}
+      </span>
     </AButton>
   </div>
 </template>

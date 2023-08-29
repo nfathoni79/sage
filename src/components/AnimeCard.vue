@@ -38,7 +38,7 @@ const handleDelete = event => {
       
       <AButton v-if="deleteBtn" color="red"
         @click.prevent="event => handleDelete(event)"
-        class="absolute top-2 right-2">
+        class="absolute top-2 right-2 w-10 h-10">
         <BookmarkSlashIcon class="w-6 h-6" />
       </AButton>
     </div>

@@ -28,14 +28,14 @@ defineExpose({ plyr })
     <div id="custom-control-wrapper" v-show="sourceSet" class="relative">
       <div v-show="showControls"
         class="absolute w-full h-full flex items-center justify-evenly">
-        <AButton color="cyan" @click="$emit('rewind')" class="z-10">
+        <AButton color="cyan" @click="$emit('rewind')" class="z-10 p-2">
           <BackwardIcon class="w-6 h-6" />
         </AButton>
         <AButton color="cyan" @click="$emit('pause')"
-          :class="playing ? 'z-10' : '-z-10'">
+          :class="['p-2', playing ? 'z-10' : '-z-10']">
           <PauseIcon class="w-8 h-8" />
         </AButton>
-        <AButton color="cyan" @click="$emit('forward')" class="z-10">
+        <AButton color="cyan" @click="$emit('forward')" class="z-10 p-2">
           <ForwardIcon class="w-6 h-6" />
         </AButton>
       </div>

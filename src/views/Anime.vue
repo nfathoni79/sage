@@ -157,7 +157,7 @@ const changeQuality = () => {
 </script>
 
 <template>
-  <div class="mx-auto max-w-md p-2">
+  <div class="mx-auto max-w-4xl p-2">
     <Spinner v-if="loading" class="mt-4 mx-auto h-8 w-8 text-blue-600" />
 
     <p v-else-if="!loading && !animeInfo"
@@ -173,9 +173,13 @@ const changeQuality = () => {
         </h1>
 
         <AButton :color="inWatchlist ? 'red' : 'green'"
-          @click="toggleWatchlist()">
+          @click="toggleWatchlist()"
+          class="h-10 w-10 md:w-auto px-2 md:px-4">
           <component :is="inWatchlist ? BookmarkSlashIcon : BookmarkIcon"
             class="w-6 h-6" />
+          <span class="hidden md:inline ml-2">
+            {{ inWatchlist ? 'Remove' : 'Add' }}
+          </span>
         </AButton>
       </div>
 
@@ -205,7 +209,7 @@ const changeQuality = () => {
       </p>
 
       <!-- Episode and Quality -->
-      <div class="mt-2 flex items-center gap-2">
+      <div class="mt-2 mx-auto max-w-md flex items-center gap-2">
         <label for="episode"
           class="text-sm font-semibold text-gray-800 dark:text-white">
           Episode

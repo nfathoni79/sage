@@ -64,8 +64,8 @@ const colorClasses = computed(() => {
 <template>
   <button
     :class="['inline-flex items-center justify-center',
-    'rounded-full px-2 py-2 font-semibold',
-    'focus:outline-none focus:ring-2', colorClasses]">
+    'rounded-full font-semibold focus:outline-none focus:ring-2',
+    colorClasses]">
     <slot></slot>
   </button>
 </template>
