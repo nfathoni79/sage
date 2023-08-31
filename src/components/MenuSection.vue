@@ -45,7 +45,7 @@ const toggleTheme = () => {
     <div class="grow">
       <form @submit.prevent="$router.push({ name: 'search', query: { q: searchText } })"
         class="relative">
-        <input type="text" v-model="searchText"
+        <input type="search" v-model="searchText"
           placeholder="Search anime..." required
           class="block w-full h-10 rounded-full shadow-sm
           border-gray-300 dark:border-gray-600

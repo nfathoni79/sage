@@ -146,6 +146,15 @@ const toggleWatchlist = (id, title, image) => {
 }
 
 /**
+ * Update Watchlist from restored backup.
+ * @param {Array} newWatchlist - New Watchlist from backup.
+ */
+const updateWatchlist = (newWatchlist) => {
+  watchlist.value = newWatchlist
+  localStorage.setItem('watchlist', JSON.stringify(watchlist.value))
+}
+
+/**
  * Set anime ID from child.
  * @param {String} id - Anime ID>
  */
@@ -250,7 +259,8 @@ const getCurrentYear = () => {
       @changeEpisode="episodeId => onChangeEpisode(episodeId)"
       @changeQuality="streamUrl => setHlsSource(streamUrl)"
       @removeWatchlist="id => toggleWatchlist(id, '', '')"
-      @toggleWatchlist="({ id, title, image }) => toggleWatchlist(id, title, image)" />
+      @toggleWatchlist="({ id, title, image }) => toggleWatchlist(id, title, image)"
+      @updateWatchlist="newWatchlist => updateWatchlist(newWatchlist)" />
     
     <div class="p-2 text-sm text-center text-gray-800 dark:text-white">
       <p>{{ `&copy; ${getCurrentYear()} ウィブ` }}</p>

@@ -50,6 +50,11 @@ const colorClasses = computed(() => {
         text-gray-50
         focus:ring-gray-300 dark:focus:ring-gray-500
       `
+    case 'disabled':
+      return cntl`
+        bg-gray-600 dark:bg-gray-700
+        text-gray-400 focus:ring-0
+      `
     default:
       return cntl`
         bg-blue-500 dark:bg-blue-600
@@ -65,7 +70,7 @@ const colorClasses = computed(() => {
   <button
     :class="['inline-flex items-center justify-center',
     'rounded-full font-semibold focus:outline-none focus:ring-2',
-    colorClasses]">
+    colorClasses, $attrs.disabled ? 'cursor-not-allowed' : '']">
     <slot></slot>
   </button>
 </template>
