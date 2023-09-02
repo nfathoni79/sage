@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+const baseUrl = import.meta.env.VITE_ANIME_BASE_URL
+
 const apiClient = axios.create({
-  baseURL: 'https://api.consumet.org/anime/gogoanime',
+  baseURL: `${baseUrl}/anime/gogoanime`,
   headers: {
     Accept: 'application/json',
   },

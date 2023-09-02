@@ -36,6 +36,9 @@ const plyrCurrentTime = ref(0)
 // HLS
 let hls = new Hls()
 
+/** CORS base URL */
+const corsBaseUrl = import.meta.env.VITE_CORS_BASE_URL
+
 /**
  * Plyr player instance.
  */
@@ -188,10 +191,11 @@ const onChangeEpisode = (id) => {
 const setHlsSource = (streamUrl) => {
   if (Hls.isSupported()) {
     sourceSet.value = false
+    const source = corsBaseUrl ? `${corsBaseUrl}/${streamUrl}` : streamUrl
 
     hls.destroy()
     hls = new Hls()
-    hls.loadSource(`${import.meta.env.VITE_CORS_BASE_URL}${streamUrl}`)
+    hls.loadSource(source)
     hls.attachMedia(plyrPlayer.value.media)
     window.hls = hls
   }
