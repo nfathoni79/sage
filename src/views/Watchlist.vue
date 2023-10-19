@@ -19,7 +19,7 @@ const emit = defineEmits(['removeWatchlist', 'updateWatchlist'])
 
 const backupId = ref('')
 const backupMessage = ref('')
-const backupOpen = ref(false)
+const settingsOpen = ref(false)
 
 /**
  * Backup button color based on backupId.
@@ -97,10 +97,10 @@ const removeWatchlist = (id) => {
 }
 
 /**
- * Show/hide backup ID field.
+ * Show/hide settings.
  */
-const toggleBackupMenu = () => {
-  backupOpen.value = !backupOpen.value
+const toggleSettings = () => {
+  settingsOpen.value = !settingsOpen.value
 }
 </script>
 
@@ -112,50 +112,56 @@ const toggleBackupMenu = () => {
     </h1>
 
     <div class="mt-4 mx-auto max-w-md text-center">
-      <form @submit.prevent="" class="flex flex-col gap-2">
-        <div class="flex items-center justify-center gap-2">
-          <AButton type="submit" :color="backupButtonColor"
-            :disabled="!backupId" @click="backupWatchlist()"
-            class="px-4 py-2">
-            <ArrowUpTrayIcon class="w-6 h-6" />
-            <span class="ml-2">Backup</span>
-          </AButton>
+      <AButton type="button" color="blue"
+        @click="toggleSettings()"
+        class="px-4 py-2">
+        <Cog6ToothIcon class="w-6 h-6" />
+        <span class="ml-2">
+          {{ settingsOpen ? 'Hide Settings' : 'Show Settings' }}
+        </span>
+      </AButton>
 
-          <AButton type="submit" :color="backupButtonColor"
-            :disabled="!backupId" @click="restoreWatchlist()"
-            class="px-4 py-2">
-            <ArrowDownTrayIcon class="w-6 h-6" />
-            <span class="ml-2">Restore</span>
-          </AButton>
+      <div v-if="settingsOpen" class="mt-2">
+        <form @submit.prevent="" class="flex flex-col gap-2">
+          <label class="flex items-center justify-center gap-2">
+            <span class="text-gray-800 dark:text-white">Backup ID</span>
+            <input type="text" v-model="backupId"
+              placeholder="Enter 19-digit unique number" required
+              class="grow h-10 rounded-full shadow-sm
+              border-gray-300 dark:border-gray-600
+              bg-gray-50 dark:bg-gray-700
+              text-gray-800 dark:text-white dark:placeholder-gray-400 text-sm
+              focus:outline-none focus:border-blue-300 dark:focus:border-blue-500
+              focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-500">
+          </label>
+          
+          <div class="flex items-center justify-center gap-2">
+            <AButton type="submit" :color="backupButtonColor"
+              :disabled="!backupId" @click="backupWatchlist()"
+              class="px-4 py-2">
+              <ArrowUpTrayIcon class="w-6 h-6" />
+              <span class="ml-2">Backup</span>
+            </AButton>
 
-          <AButton type="button" color="blue"
-            @click="toggleBackupMenu()"
-            class="px-4 py-2">
-            <Cog6ToothIcon class="w-6 h-6" />
-            <span class="ml-2">Settings</span>
-          </AButton>
-        </div>
+            <AButton type="submit" :color="backupButtonColor"
+              :disabled="!backupId" @click="restoreWatchlist()"
+              class="px-4 py-2">
+              <ArrowDownTrayIcon class="w-6 h-6" />
+              <span class="ml-2">Restore</span>
+            </AButton>
+          </div>
+        </form>
 
-        <div v-if="backupOpen">
-          <input type="text" v-model="backupId"
-            placeholder="Backup ID" required
-            class="block w-full h-10 rounded-full shadow-sm
-            border-gray-300 dark:border-gray-600
-            bg-gray-50 dark:bg-gray-700
-            text-gray-800 dark:text-white dark:placeholder-gray-400 text-sm
-            focus:outline-none focus:border-blue-300 dark:focus:border-blue-500
-            focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-500">
-        </div>
-
-        <p v-if="backupMessage" class="text-gray-800 dark:text-white">
+        <p v-if="backupMessage"
+          class="mt-2 text-gray-800 dark:text-white">
           {{ backupMessage }}
         </p>
-      </form>
+      </div>
     </div>
 
     <p v-if="watchlist.length <= 0"
       class="mt-4 text-gray-800 dark:text-white text-center">
-      No anime to watch yet
+      No anime to watch yet.
     </p>
 
     <div v-else>
@@ -164,7 +170,7 @@ const toggleBackupMenu = () => {
         md:grid-cols-4 lg:grid-cols-5 gap-2">
         <AnimeCard v-for="item in watchlist" :key="item.id"
           :id="item.id" :title="item.title"
-          :image="item.image" :genres="[]" :deleteBtn="true"
+          :image="item.image" :genres="[]" :deleteBtn="settingsOpen"
           @click="$router.push({ name: 'anime', params: { id: item.id } })"
           @clickDelete="removeWatchlist(item.id)" />
       </div>
