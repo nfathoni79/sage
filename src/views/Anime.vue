@@ -77,7 +77,16 @@ watch(() => props.lastEpisodeId, newLastEpisodeId => {
 
 watch(sources, newSources => {
   if (newSources.length > 0) {
-    quality.value = newSources[0].quality
+    const qualityPref = localStorage.getItem('qualityPref')
+    const qualityList = newSources.map(source => source.quality)
+
+    if (qualityPref != null && qualityList.includes(qualityPref)) {
+      quality.value = qualityPref
+    } else {
+      quality.value = newSources[0].quality
+      localStorage.setItem('qualityPref', quality.value)
+    }
+
     emit('changeQuality', streamUrl.value)
   }
 })
@@ -152,6 +161,7 @@ const changeEpisode = () => {
  * Select a quality.
  */
 const changeQuality = () => {
+  localStorage.setItem('qualityPref', quality.value)
   emit('changeQuality', streamUrl.value)
 }
 </script>
